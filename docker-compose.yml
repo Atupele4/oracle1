@@ -1,0 +1,47 @@
+version: '3'
+services:
+  oracle-db-1:
+    image: oracle/database:12.2.0.1-ee
+    container_name: oracle-db-1
+    environment:
+      - ORACLE_SID=ORCLCDB
+      - ORACLE_PDB=ORCLPDB1
+      - ORACLE_PWD=oracle
+    volumes:
+      - ./data1:/ORACLE/oradata
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    networks:
+      oracle-network:
+        ipv4_address: 172.16.238.10
+
+  oracle-db-2:
+    image: oracle/database:12.2.0.1-ee
+    container_name: oracle-db-2
+    environment:
+      - ORACLE_SID=ORCLCDB
+      - ORACLE_PDB=ORCLPDB2
+      - ORACLE_PWD=oracle
+    volumes:
+      - ./data2:/ORACLE/oradata
+    ports:
+      - "1522:1521"
+      - "5501:5500"
+    networks:
+      oracle-network:
+        ipv4_address: 172.16.238.20
+
+networks:
+  oracle-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.238.0/24
+
+  scp:
+    image: ubuntu:latest
+    container_name: scp
+    command: ["tail", "-f", "/dev/null"]
+    networks:
+      - oracle-network
